@@ -22,14 +22,15 @@ Cross-speaker comparison of Japanese pitch accents is notoriously unstable due t
 We evaluate on Tarui preservation—a critical test for intermediate accent categories that data-driven methods tend to collapse.
 
 | Method | Tarui Rate | Balance Ratio | Assessment |
-|--------|-----------|---------------|------------|
+| --- | --- | --- | --- |
 | Mean F0 | 1.5% | 1.42 | Collapse |
 | Histogram EMD | 85.3% | 0.83 | Over-assign |
-| **wav2vec 2.0 variants:** | | | |
-| ↳ Mean Pool (3a) | 0% | 4.46 | Collapse |
-| ↳ DTW Layer 24 (3b) | 0% | 1.55 | Collapse |
-| ↳ DTW Layer 9 (3c) | 22.1% | 0.99 | Preserved |
+| wav2vec 2.0 (3a: Mean Pool) | 0% | 4.46 | Collapse |
+| wav2vec 2.0 (3b: DTW L24) | 0% | 1.55 | Collapse |
+| wav2vec 2.0 (3c: DTW L9) | 22.1% | 0.99 | Preserved |
 | **DTW (ours)** | **57.4%** | **1.01** | **Preserved** |
+
+Our DTW-based distance achieves **2.6× improvement** over the best SSL baseline (wav2vec 3c).
 
 **Key finding**: Even with optimal configuration (middle-layer + frame-level DTW), wav2vec achieves only 22.1% Tarui preservation vs. our method's 57.4%—a **2.6× improvement** demonstrating the value of interpretable, phonologically grounded distance design.
 
