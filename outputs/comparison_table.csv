@@ -1,0 +1,5 @@
+method,tarui_classification_rate,mean_tarui_kansai_ratio,tarui_preserved,tarui_overassigned,tarui_collapsed
+dtw,0.5735294117647058,1.0135018197954075,True,False,False
+meanf0,0.014705882352941176,1.4182649616618532,False,False,True
+histemd,0.8529411764705882,0.8334499071995265,False,True,False
+wav2vec,0.0,4.457827330616833,False,False,True

@@ -1,0 +1,7 @@
+method,tarui_rate,assessment
+Mean F0,1.5%,Collapse
+Histogram EMD,85.3%,Over-assign
+wav2vec Mean Pool (Original),0.0%,Collapse
+wav2vec DTW Layer24,0.0%,Collapse
+wav2vec DTW Layer9,22.1%,Preserved
+DTW (Ours),57.4%,Preserved

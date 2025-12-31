@@ -1,0 +1,4 @@
+method,tarui_rate,balance_ratio,assessment
+wav2vec Mean Pool (Original),0.0,4.456885801973819,Collapse
+wav2vec DTW Layer24,0.0,1.5462866129144848,Collapse
+wav2vec DTW Layer9,0.22058823529411764,0.9884970072314709,Preserved
