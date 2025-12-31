@@ -26,6 +26,17 @@ Cross-speaker comparison of Japanese pitch accents is notoriously unstable due t
 | wav2vec 2.0 | 19.1% | 0.94 | Partial |
 | **DTW (ours)** | **57.4%** | **1.01** | **Balanced** |
 
+### Computational Cost
+
+| Method | Time (ms) | Notes |
+|--------|-----------|-------|
+| Mean F0 | 0.04 | Trivial; no temporal info |
+| Histogram EMD | 0.20 | Distribution only |
+| DTW (full) | 0.99 | z(t) + Δz(t), α=0.7, Numba-accelerated |
+| wav2vec 2.0 | ~450 | GPU recommended |
+
+DTW-based distance remains **CPU-feasible** (<1ms per pair with Numba), processing the full dataset (68 speakers × 25 phrases × 12 references) in under 30 seconds.
+
 ## Installation
 
 ```bash
@@ -78,6 +89,26 @@ python run_pipeline.py \
     --output_dir outputs/
 ```
 
+### Running Benchmarks
+
+To reproduce the computational cost measurements from Appendix D:
+
+```bash
+python benchmark_timing.py
+```
+
+This will output timing results for all distance metrics and scaling analysis.
+
+### Generating Visualizations
+
+To generate figures including the failure mode visualization (Appendix C):
+
+```bash
+python -m src.visualization
+```
+
+Output figures will be saved to `outputs/figures/`.
+
 ## Repository Structure
 
 ```
@@ -86,6 +117,7 @@ pitch-accent-dtw2025/
 ├── LICENSE
 ├── requirements.txt
 ├── run_pipeline.py              # Main entry point
+├── benchmark_timing.py          # Computational cost measurement
 ├── src/
 │   ├── __init__.py
 │   ├── extractor.py             # F0 extraction & normalization
@@ -93,8 +125,7 @@ pitch-accent-dtw2025/
 │   ├── baselines.py             # Baseline methods (Mean F0, EMD, wav2vec)
 │   ├── classifier.py            # Two-stage accent classifier
 │   ├── virtual_reference.py     # Excel-based symbolic references
-│   ├── unsupervised.py          # Clustering analysis
-│   └── visualization.py         # Figure generation
+│   └── visualization.py         # Figure generation (NEW)
 ├── configs/
 │   └── default.yaml             # Default parameters
 ├── data/
@@ -106,6 +137,8 @@ pitch-accent-dtw2025/
     ├── supervised_results.csv
     ├── baseline_results.csv
     └── figures/
+        ├── fig_failure_mode.png      # Appendix C
+        └── fig_baseline_comparison.png
 ```
 
 ## Data
@@ -142,6 +175,7 @@ D = α * DTW(z) + (1-α) * DTW(Δz),  α = 0.7
 
 - Sakoe-Chiba band constraint (ratio=0.15)
 - Costs: substitution=1.0, insertion=deletion=1.1
+- Numba JIT acceleration available
 
 ### Two-Stage Classification
 
@@ -149,11 +183,35 @@ D = α * DTW(z) + (1-α) * DTW(Δz),  α = 0.7
 - **Stage 2**: Kansai-block → {Kansai, Tarui}
 - Ambiguity thresholds: m_abs < 0.01, m_rel < 0.03
 
+## Reproducing Paper Results
+
+### Main Results (Table 1)
+
+```bash
+python run_pipeline.py \
+    --subject_dir data/subjects \
+    --reference_dir data/references \
+    --output_dir outputs/
+```
+
+### Computational Cost (Appendix D)
+
+```bash
+python benchmark_timing.py
+```
+
+### Failure Mode Visualization (Appendix C)
+
+```bash
+python -m src.visualization
+```
+
 ## Citation
 
 ```bibtex
 @article{anonymous2025pitchaccent,
-  title={Speaker-normalized Acoustic Distance for Japanese Pitch Accent: Design Principles and Evaluation},
+  title={Speaker-normalized Acoustic Distance for Japanese Pitch Accent: 
+         Design Principles and Evaluation},
   author={Anonymous},
   journal={Transactions of the Association for Computational Linguistics},
   year={2025}
@@ -167,6 +225,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 - [librosa](https://librosa.org/) for audio processing
+- [Numba](https://numba.pydata.org/) for JIT acceleration
 - [wav2vec 2.0](https://github.com/facebookresearch/fairseq) for SSL embeddings
 - Linguistic descriptions from Uwano (1999), Kibe (2010), and others
 

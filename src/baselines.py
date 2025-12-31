@@ -124,7 +124,10 @@ def _load_wav2vec():
     """Lazy loading of wav2vec model."""
     global _wav2vec_model, _wav2vec_processor
     if _wav2vec_model is None and _HAVE_WAV2VEC:
-        model_name = "facebook/wav2vec2-xlsr-53"
+        # XLSR-53 with espeak phoneme fine-tuning
+        # Note: This model is not explicitly trained for pitch-accent contrasts,
+        # serving as a contrastive baseline rather than a task-optimized competitor.
+        model_name = "facebook/wav2vec2-xlsr-53-espeak-cv-ft"
         _wav2vec_processor = Wav2Vec2Processor.from_pretrained(model_name)
         _wav2vec_model = Wav2Vec2Model.from_pretrained(model_name)
         _wav2vec_model.eval()

@@ -1,64 +1,161 @@
-# Default configuration for pitch accent distance pipeline
-# TACL 2025
+# Default configuration for pitch-accent-dtw2025
+# TACL 2025: Speaker-normalized Acoustic Distance for Japanese Pitch Accent
 
-# Random seed for reproducibility
-seed: 2025
-
-# Audio processing
+# =============================================================================
+# Audio Processing
+# =============================================================================
 audio:
   sample_rate: 16000
-  fmin: 50
-  fmax: 700
-  frame_length: 1024
-  hop_length: 160
-
+  
 # Voice Activity Detection
 vad:
   top_db: 25
   min_segment_ms: 120
 
-# DTW parameters
+# F0 Extraction
+f0:
+  method: "yin"  # or "pyin"
+  fmin: 50
+  fmax: 700
+  voicing_threshold: 0.4
+  gap_interpolation_ms: 250
+
+# Normalization
+normalization:
+  method: "mad_z"  # semitone + MAD-based z-scoring
+  smoothing:
+    method: "savgol"
+    window: 11
+    order: 3
+
+# =============================================================================
+# DTW Distance
+# =============================================================================
 dtw:
-  band_ratio: 0.15      # Sakoe-Chiba band width
-  insertion_cost: 1.1
-  deletion_cost: 1.1
-  substitution_cost: 1.0
-  alpha: 0.7            # Weight for static (vs delta)
+  band_ratio: 0.15  # Sakoe-Chiba band constraint
+  costs:
+    substitution: 1.0
+    insertion: 1.1
+    deletion: 1.1
+  alpha: 0.7  # Weight for static vs delta: D = α*DTW(z) + (1-α)*DTW(Δz)
 
-# Classification thresholds
+# =============================================================================
+# Classification
+# =============================================================================
 classification:
-  ambiguity_abs_floor: 0.01
-  ambiguity_rel_floor: 0.03
-  target_ambiguous_rate: 0.25
   k_neighbors: 3
+  
+  # Two-stage classification
+  stage1_classes: ["tokyo", "kagoshima", "kansai_block"]
+  stage2_classes: ["kansai", "tarui"]
+  
+  # Ambiguity thresholds
+  ambiguity:
+    absolute_margin: 0.01
+    relative_margin: 0.03
+  
+  # Conservative assignment for ambiguous cases
+  ambiguous_default: "kansai"
 
-# Unsupervised clustering
-unsupervised:
-  max_subjects: 36
-  subsample_factor: 2
-  fastdtw_radius: 5
-  n_jobs: 4
+# =============================================================================
+# Unsupervised Clustering
+# =============================================================================
+clustering:
+  method: "ward"  # Ward hierarchical clustering
   k_range: [2, 3, 4, 5, 6]
+  default_k: 4
+  
+  # FastDTW settings
+  fastdtw:
+    radius: 5
+    subsample: 2
 
-# Virtual reference synthesis
+# =============================================================================
+# Baseline Methods
+# =============================================================================
+baselines:
+  # Baseline 1: Mean F0
+  mean_f0:
+    enabled: true
+  
+  # Baseline 2: Histogram EMD
+  histogram_emd:
+    enabled: true
+    n_bins: 30
+    range: [-3.0, 3.0]
+  
+  # Baseline 3: wav2vec 2.0 (enhanced)
+  wav2vec:
+    enabled: true
+    model_name: "facebook/wav2vec2-large-xlsr-53"
+    
+    # Three variants
+    variants:
+      3a:
+        name: "Mean Pool (Original)"
+        method: "mean_pool"
+        layer: 24
+      3b:
+        name: "DTW Layer 24"
+        method: "dtw"
+        layer: 24
+      3c:
+        name: "DTW Layer 9 (Recommended)"
+        method: "dtw"
+        layer: 9
+    
+    # Layer-wise analysis
+    analyze_layers: [1, 3, 6, 9, 12, 15, 18, 21, 24]
+    
+    # DTW settings for wav2vec
+    dtw_band_ratio: 0.15
+
+# =============================================================================
+# Virtual Reference (Symbolic Injection)
+# =============================================================================
 virtual_reference:
-  per_row_variants: 1
-  jitter: 0.04
-  smooth_window: 7
-  tilt_by_label:
-    tokyo: -0.05
-    kansai: -0.10
-    tarui: -0.08
-    kagoshima: 0.00
+  excel_path: "data/accent_types.xlsx"
+  
+  # Symbol-to-pitch mapping
+  symbols:
+    L: -1.0  # Low
+    H: 1.0   # High
+    R: 0.5   # Rising (intermediate)
+  
+  # Declination simulation
+  declination:
+    min: -0.05
+    max: -0.10
+  
+  # Smoothing for synthetic contours
+  smoothing:
+    method: "savgol"
+    window: 11
+    order: 3
 
-# Symbol-to-level mapping
-symbol_levels:
-  L: -1.0    # Low: phrase-initial or post-accent
-  H: 1.0     # High: accent peak
-  R: 0.5     # Rising: transitional
-
+# =============================================================================
 # Output
+# =============================================================================
 output:
-  save_intermediate: true
-  figure_dpi: 300
-  figure_format: png
+  save_distances: true
+  save_assignments: true
+  save_figures: true
+  
+  files:
+    supervised: "supervised_results.csv"
+    baseline: "baseline_results.csv"
+    wav2vec_enhanced: "wav2vec_enhanced_results.csv"
+    unsupervised: "unsup_subjects.csv"
+    silhouette: "unsup_silhouette.json"
+  
+  figures:
+    baseline_comparison: "fig02_baseline_comparison.png"
+    supervised_heatmap: "fig03_supervised_heatmap.png"
+    unsup_mds: "fig04_unsup_mds.png"
+
+# =============================================================================
+# Reproducibility
+# =============================================================================
+reproducibility:
+  random_seed: 42
+  n_jobs: -1  # Use all available cores

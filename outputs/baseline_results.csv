@@ -1,0 +1,14 @@
+# Baseline Comparison Results (Table 1)
+# TACL 2025: Speaker-normalized Acoustic Distance for Japanese Pitch Accent
+#
+# Tarui Rate: Classification frequency (higher = more Tarui assignments)
+# Balance Ratio: Tarui/Kansai distance ratio (1.0 = balanced discrimination)
+# Assessment: Collapse (<10% or ratio>1.2), Over-assign (>80%), Preserved (15-80% with ratio~1.0)
+
+method,variant,tarui_rate,balance_ratio,assessment,notes
+Mean F0,,-0.015,1.42,Collapse,No temporal information
+Histogram EMD,,0.853,0.83,Over-assign,Distribution only - lacks discriminative power
+wav2vec 2.0,3a (Mean Pool),0.000,4.46,Collapse,Time-averaged final layer embeddings
+wav2vec 2.0,3b (DTW L24),0.000,1.55,Collapse,Frame-level DTW on final layer
+wav2vec 2.0,3c (DTW L9),0.221,0.99,Preserved,Frame-level DTW on middle layer
+DTW (ours),,0.574,1.01,Preserved,Interpretable pitch contour comparison

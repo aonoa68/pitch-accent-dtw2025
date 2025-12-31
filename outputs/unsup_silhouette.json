@@ -1,0 +1,37 @@
+{
+  "experiment": "Unsupervised clustering analysis",
+  "method": "Ward hierarchical clustering",
+  "distance_metric": "FastDTW on MAD-z normalized F0",
+  "n_subjects": 68,
+  "population": "Kashiwabara, Maibara City, Shiga Prefecture (Tarui accent region)",
+  
+  "silhouette_scores": {
+    "k2": 0.871,
+    "k3": 0.696,
+    "k4": 0.320,
+    "k5": 0.285,
+    "k6": 0.251
+  },
+  
+  "optimal_k": 2,
+  "optimal_silhouette": 0.871,
+  
+  "k4_analysis": {
+    "silhouette": 0.320,
+    "cluster_sizes": [13, 53, 1, 1],
+    "cluster_percentages": [19.1, 77.9, 1.5, 1.5],
+    "interpretation": "Single dominant cluster reflecting linguistic homogeneity of Tarui-region population"
+  },
+  
+  "linguistic_interpretation": {
+    "finding": "Unsupervised clustering reveals unimodal population structure with outliers",
+    "implication": "Data-driven methods collapse intermediate accent categories without explicit prototype injection",
+    "validation": "Cluster structure consistent with linguistic reality of Kashiwabara as Tarui accent zone"
+  },
+  
+  "comparison_to_supervised": {
+    "supervised_tarui_rate": 0.574,
+    "unsupervised_dominant_cluster": 0.779,
+    "note": "Supervised method with symbolic prototypes achieves finer discrimination than unsupervised clustering"
+  }
+}

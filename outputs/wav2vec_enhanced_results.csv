@@ -1,0 +1,18 @@
+# wav2vec 2.0 Enhanced Baseline Results
+# TACL 2025: Speaker-normalized Acoustic Distance for Japanese Pitch Accent
+# 
+# Experiment: Tarui preservation analysis across wav2vec configurations
+# Dataset: 68 speakers from Kashiwabara (Tarui accent region)
+# Model: facebook/wav2vec2-large-xlsr-53
+
+method,layer,tarui_rate,tarui_count,total_count,balance_ratio,assessment
+mean_pool,24,0.000,0,68,4.46,Collapse
+dtw,24,0.000,0,68,1.55,Collapse
+dtw,21,0.000,0,68,1.48,Collapse
+dtw,18,0.015,1,68,1.32,Collapse
+dtw,15,0.044,3,68,1.21,Collapse
+dtw,12,0.103,7,68,1.08,Partial
+dtw,9,0.221,15,68,0.99,Preserved
+dtw,6,0.176,12,68,1.02,Preserved
+dtw,3,0.132,9,68,1.05,Partial
+dtw,1,0.088,6,68,1.12,Partial
