@@ -6,6 +6,7 @@ Includes:
 - Distance heatmaps
 - MDS projections
 - Contour comparisons
+- Baseline comparison with wav2vec variants
 """
 
 import numpy as np
@@ -76,7 +77,6 @@ def plot_failure_mode(
              label='Kansai ref', alpha=0.7)
     
     # Mark accent nucleus region (approximate)
-    # Find peak regions
     subj_valid = np.where(np.isfinite(subject_z))[0]
     if len(subj_valid) > 10:
         peak_idx = subj_valid[np.argmax(subject_z[subj_valid])]
@@ -274,10 +274,12 @@ def plot_mds_clusters(
 def plot_baseline_comparison(
     results: Dict[str, Dict[str, float]],
     save_path: Optional[str] = None,
-    figsize: Tuple[float, float] = (10, 4)
+    figsize: Tuple[float, float] = (12, 5)
 ):
     """
     Plot baseline comparison (Tarui preservation rate and balance ratio).
+    
+    Updated for wav2vec 3-variant analysis.
     
     Parameters
     ----------
@@ -301,17 +303,35 @@ def plot_baseline_comparison(
     
     # Left: Tarui classification rate
     ax1 = axes[0]
-    colors = ['steelblue' if r > 0.15 else 'lightcoral' for r in tarui_rates]
+    
+    # Color coding: green for preserved (>15%), red for collapse (<15%)
+    colors = []
+    for m, r in zip(methods, tarui_rates):
+        if 'DTW' in m:
+            colors.append('green')
+        elif r > 0.15:
+            colors.append('steelblue')
+        else:
+            colors.append('lightcoral')
+    
     bars1 = ax1.bar(methods, tarui_rates, color=colors, alpha=0.8)
-    ax1.axhline(0.15, color='red', linestyle='--', label='15% threshold')
+    ax1.axhline(0.15, color='red', linestyle='--', linewidth=1, label='15% threshold')
+    ax1.axhline(0.574, color='green', linestyle=':', linewidth=1, alpha=0.7, label='DTW baseline (57.4%)')
     ax1.set_ylabel('Tarui Classification Rate')
     ax1.set_title('(a) Tarui Preservation by Method')
     ax1.set_ylim(0, 1)
-    ax1.legend()
+    ax1.legend(loc='upper right', fontsize=8)
     ax1.grid(True, alpha=0.3, axis='y')
     
     # Rotate x labels
-    ax1.set_xticklabels(methods, rotation=15, ha='right')
+    ax1.set_xticklabels(methods, rotation=30, ha='right', fontsize=9)
+    
+    # Add value labels on bars
+    for bar, rate in zip(bars1, tarui_rates):
+        ax1.annotate(f'{rate*100:.1f}%', 
+                    xy=(bar.get_x() + bar.get_width()/2, bar.get_height()),
+                    xytext=(0, 3), textcoords='offset points',
+                    ha='center', va='bottom', fontsize=8)
     
     # Right: Balance ratio
     ax2 = axes[1]
@@ -321,11 +341,80 @@ def plot_baseline_comparison(
     ax2.axhspan(0.9, 1.1, alpha=0.2, color='green', label='Acceptable range')
     ax2.set_ylabel('Tarui/Kansai Distance Ratio')
     ax2.set_title('(b) Discrimination Balance')
-    ax2.set_ylim(0, 2)
-    ax2.legend(loc='upper right')
+    ax2.set_ylim(0, 5)
+    ax2.legend(loc='upper right', fontsize=8)
     ax2.grid(True, alpha=0.3, axis='y')
     
-    ax2.set_xticklabels(methods, rotation=15, ha='right')
+    ax2.set_xticklabels(methods, rotation=30, ha='right', fontsize=9)
+    
+    plt.tight_layout()
+    
+    if save_path:
+        fig.savefig(save_path, dpi=300, bbox_inches='tight')
+        print(f"[viz] Saved: {save_path}")
+    
+    return fig
+
+
+def plot_wav2vec_layer_analysis(
+    layer_results: Dict[int, Dict[str, float]],
+    save_path: Optional[str] = None,
+    figsize: Tuple[float, float] = (10, 4)
+):
+    """
+    Plot wav2vec layer-wise analysis results.
+    
+    Parameters
+    ----------
+    layer_results : dict
+        {layer_index: {'tarui_rate': float, 'balance_ratio': float}}
+    save_path : str, optional
+        Path to save figure
+    figsize : tuple
+        Figure size
+    
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+    """
+    fig, axes = plt.subplots(1, 2, figsize=figsize)
+    
+    layers = sorted(layer_results.keys())
+    tarui_rates = [layer_results[l]['tarui_rate'] for l in layers]
+    balance_ratios = [layer_results[l]['balance_ratio'] for l in layers]
+    
+    # Left: Tarui rate by layer
+    ax1 = axes[0]
+    ax1.plot(layers, tarui_rates, 'o-', color='steelblue', linewidth=2, markersize=8)
+    ax1.axhline(0.574, color='green', linestyle='--', label='DTW (ours): 57.4%')
+    ax1.axhline(0.221, color='orange', linestyle=':', label='Best wav2vec: 22.1%')
+    ax1.fill_between(layers, 0, tarui_rates, alpha=0.3, color='steelblue')
+    ax1.set_xlabel('Transformer Layer')
+    ax1.set_ylabel('Tarui Classification Rate')
+    ax1.set_title('(a) Tarui Preservation by Layer')
+    ax1.set_ylim(0, 0.7)
+    ax1.legend(loc='upper right', fontsize=8)
+    ax1.grid(True, alpha=0.3)
+    
+    # Mark optimal layer
+    best_layer = layers[np.argmax(tarui_rates)]
+    ax1.annotate(f'L{best_layer}: {max(tarui_rates)*100:.1f}%',
+                xy=(best_layer, max(tarui_rates)),
+                xytext=(best_layer + 2, max(tarui_rates) + 0.05),
+                arrowprops=dict(arrowstyle='->', color='black'),
+                fontsize=9, fontweight='bold')
+    
+    # Right: Balance ratio by layer
+    ax2 = axes[1]
+    ax2.plot(layers, balance_ratios, 's-', color='darkorange', linewidth=2, markersize=8)
+    ax2.axhline(1.0, color='green', linestyle='--', label='Balanced (1.0)')
+    ax2.axhspan(0.9, 1.1, alpha=0.2, color='green')
+    ax2.set_xlabel('Transformer Layer')
+    ax2.set_ylabel('Tarui/Kansai Distance Ratio')
+    ax2.set_title('(b) Discrimination Balance by Layer')
+    ax2.set_ylim(0, 5)
+    ax2.legend(loc='upper right', fontsize=8)
+    ax2.grid(True, alpha=0.3)
     
     plt.tight_layout()
     
@@ -399,8 +488,6 @@ def generate_synthetic_failure_example(seed: int = 2025):
 # ============================================================
 
 if __name__ == "__main__":
-    import os
-    
     output_dir = "outputs/figures"
     os.makedirs(output_dir, exist_ok=True)
     
@@ -413,17 +500,37 @@ if __name__ == "__main__":
         save_path=f"{output_dir}/fig_failure_mode.png"
     )
     
-    # Generate baseline comparison example
+    # Generate baseline comparison example (UPDATED for wav2vec variants)
     print("Generating baseline comparison...")
     baseline_results = {
         'Mean F0': {'tarui_rate': 0.015, 'balance_ratio': 1.42},
         'Hist EMD': {'tarui_rate': 0.853, 'balance_ratio': 0.83},
-        'wav2vec': {'tarui_rate': 0.191, 'balance_ratio': 0.94},
+        'wav2vec 3a': {'tarui_rate': 0.000, 'balance_ratio': 4.46},  # Mean Pool
+        'wav2vec 3b': {'tarui_rate': 0.000, 'balance_ratio': 1.55},  # DTW L24
+        'wav2vec 3c': {'tarui_rate': 0.221, 'balance_ratio': 0.99},  # DTW L9
         'DTW (ours)': {'tarui_rate': 0.574, 'balance_ratio': 1.01}
     }
     plot_baseline_comparison(
         baseline_results,
         save_path=f"{output_dir}/fig_baseline_comparison.png"
+    )
+    
+    # Generate wav2vec layer analysis
+    print("Generating wav2vec layer analysis...")
+    layer_results = {
+        1: {'tarui_rate': 0.088, 'balance_ratio': 1.12},
+        3: {'tarui_rate': 0.132, 'balance_ratio': 1.05},
+        6: {'tarui_rate': 0.176, 'balance_ratio': 1.02},
+        9: {'tarui_rate': 0.221, 'balance_ratio': 0.99},
+        12: {'tarui_rate': 0.103, 'balance_ratio': 1.08},
+        15: {'tarui_rate': 0.044, 'balance_ratio': 1.21},
+        18: {'tarui_rate': 0.015, 'balance_ratio': 1.32},
+        21: {'tarui_rate': 0.000, 'balance_ratio': 1.48},
+        24: {'tarui_rate': 0.000, 'balance_ratio': 1.55}
+    }
+    plot_wav2vec_layer_analysis(
+        layer_results,
+        save_path=f"{output_dir}/fig_wav2vec_layers.png"
     )
     
     print(f"\n[Done] Figures saved to {output_dir}/")
