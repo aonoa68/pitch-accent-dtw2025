@@ -3,37 +3,34 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
-This repository provides code and materials for the TACL 2025 paper:
+This repository provides code and materials for the TACL submission:
 
 > **Speaker-normalized Acoustic Distance for Japanese Pitch Accent: Design Principles and Evaluation**
 
 ## Overview
 
-Cross-speaker comparison of Japanese pitch accents is notoriously unstable due to individual variation in F0 range, speech rate, and phonation. This work establishes **design principles for speaker-normalized pitch-accent distance**, demonstrating that interpretable distance design can substantially exceed black-box representations for prosodic typology tasks.
+Cross-speaker comparison of Japanese pitch accents is notoriously unstable due to individual variation in F0 range, speech rate, and phonation. This work designs a **measurement instrument** that positions Japanese speakers along documented pitch-accent gradients in a stable, interpretable, and linguistically anchored way. The axis is anchored by virtual reference contours synthesised from independent phonological descriptions of four canonical accent varieties (Tokyo, Kansai, Tarui, Kagoshima); the distance space is evaluated by whether it places 68 Kashiwabara speakers in the intermediate Tarui region that an independent dialectological description predicts.
 
 ### Key Contributions
 
 1. **Normalization pipeline**: Semitone transform + MAD-based z-scoring that preserves phonological contrasts
-2. **Evaluation framework**: Prioritizes rank stability and intermediate-category preservation over classification accuracy
-3. **Symbolic injection**: Method for injecting L/H/R accent patterns into acoustic space as virtual reference contours
+2. **Symbolic-to-acoustic mapping**: L/H/R descriptions of canonical varieties are converted to virtual reference contours, anchoring the axis externally to the recorded corpus
+3. **Evaluation framework**: Based on gradient preservation (intermediate-region placement rate, balance ratio, symmetric index) rather than discrete classification accuracy
 
-### Main Results
+### Main Results (Table 1 of the paper)
 
-| Method | Tarui Rate | Balance Ratio | Assessment |
-| --- | --- | --- | --- |
-| Mean F0 | 1.5% | 1.42 | Collapse |
-| Histogram EMD | 85.3% | 0.83 | Over-assign |
-| wav2vec 2.0 (3a: Mean Pool) | 0% | 4.46 | Collapse |
-| wav2vec 2.0 (3b: DTW L24) | 0% | 1.55 | Collapse |
-| wav2vec 2.0 (3c: DTW L9) | 22.1% | 0.99 | Preserved |
-| **DTW (ours)** | **57.4%** | **1.01** | **Preserved** |
+Three indicators on the Kansai–Tokyo segment of the externally anchored axis: intermediate-region placement rate (Inter.%), balance ratio r = mean(d_T/d_K), and symmetric index s = mean((d_K − d_T)/(d_K + d_T)).
 
-Our DTW-based distance achieves **2.6× improvement** over the best SSL baseline (wav2vec 3c: 22.1% → 57.4%).
+| Method | Inter.% | r | s | Pattern |
+| --- | --- | --- | --- | --- |
+| Mean F0 | 1.5% | 1.42 | −0.05 | Gradient collapse |
+| Histogram EMD | 85.3% | 0.83 | +0.12 | Gradient over-flattening |
+| wav2vec 2.0 (3a: Mean Pool, L24) | 0% | 4.46 | −0.61 | Pole collapse |
+| wav2vec 2.0 (3b: DTW, L24) | 0% | 1.55 | −0.21 | Pole collapse |
+| wav2vec 2.0 (3c: DTW, L9) | 22.1% | 0.99 | +0.01 | Off-axis variation |
+| **DTW (ours)** | **57.4%** | **1.01** | **−0.01** | **Gradient preserved** |
 
-**Assessment criteria:**
-- **Collapse**: Tarui rate < 15% (intermediate category absorbed into adjacent categories)
-- **Over-assign**: Tarui rate > 80% (indiscriminate assignment regardless of actual accent)
-- **Preserved**: 15% ≤ Tarui rate ≤ 80% AND 0.9 ≤ Balance ratio ≤ 1.1
+Only the proposed instrument simultaneously places a majority of speakers in the predicted intermediate region and keeps the axis symmetric (r ≈ 1, s ≈ 0). The contrast with wav2vec 3c is best read as a difference in **which axis is being measured** (the SSL instrument has an internal axis, but it is off-axis relative to the linguistically defined Kansai–Tokyo gradient), not as a difference in accuracy along a shared axis.
 
 ### Computational Cost
 
@@ -124,31 +121,54 @@ pitch-accent-dtw2025/
 ├── README.md
 ├── LICENSE
 ├── requirements.txt
-├── run_pipeline.py              # Main entry point
-├── benchmark_timing.py          # Computational cost measurement
+├── run_pipeline.py                       # Main entry point
+├── benchmark_timing.py                   # Computational cost measurement
+├── sensitivity_sweep.py                  # Table 2: band/alpha sweep (fixed thresholds)
+├── sensitivity_sweep_percfg.py           # Table 2 variant: per-config thresholds (reference)
+├── cluster_comparison.py                 # Ward vs average vs PAM vs Ward-on-MDS
+├── build_speaker_table.py                # Join distances with metadata (Appendix A.1)
+├── stratified_analysis.py                # Appendix A.1: cohort/sex/affinity analysis
 ├── src/
 │   ├── __init__.py
-│   ├── extractor.py             # F0 extraction & normalization
-│   ├── dtw_distance.py          # DTW-based distance computation
-│   ├── baselines.py             # Baseline methods (Mean F0, EMD, wav2vec)
-│   ├── classifier.py            # Two-stage accent classifier
-│   ├── virtual_reference.py     # Excel-based symbolic references
-│   ├── visualization.py         # Figure generation
-│   └── wav2vec_enhanced.py      # wav2vec 3-variant baselines (3a/3b/3c)
+│   ├── extractor.py                      # F0 extraction & normalization
+│   ├── dtw_distance.py                   # DTW-based distance computation
+│   ├── baselines.py                      # Baseline methods (Mean F0, EMD, wav2vec)
+│   ├── classifier.py                     # Two-stage accent classifier
+│   ├── virtual_reference.py              # Excel-based symbolic references
+│   ├── visualization.py                  # Figure generation
+│   ├── unsupervised.py                   # Unsupervised clustering helpers
+│   └── wav2vec_enhanced.py               # wav2vec 3-variant baselines (3a/3b/3c)
 ├── configs/
-│   └── default.yaml             # Default parameters
+│   └── default.yaml                      # Default parameters
 ├── data/
-│   ├── accent_types.xlsx        # Symbolic accent patterns (L/H/R)
-│   └── README.md                # Data access instructions
+│   ├── accent_types_20251027.xlsx        # Symbolic accent patterns (L/H/R)
+│   └── data_README.md                    # Data access instructions
 └── outputs/
-    ├── supervised_results.csv
-    ├── baseline_results.csv
-    ├── unified_comparison.csv        # Table 1 data
-    ├── wav2vec_enhanced_summary.csv  # wav2vec 3-variant results
-    └── figures/
-        ├── fig_failure_mode.png          # Appendix C (Figure 7)
-        └── fig_baseline_comparison.png   # Figure 2
+    ├── baseline_results.csv              # Baseline distances
+    ├── supervised_results_dtw.csv        # DTW distances (no Excel refs)
+    ├── supervised_results_with_excel.csv # DTW distances (with Excel refs)
+    ├── unsup_D_total.npy                 # 68x68 FastDTW matrix
+    ├── unsup_subjects.csv                # MDS coordinates + cluster labels
+    ├── unsup_silhouette.json             # Silhouette by k
+    ├── wav2vec_enhanced_results.csv      # wav2vec layer sweep
+    ├── wav2vec_enhanced_summary.csv      # wav2vec 3a/3b/3c summary
+    ├── sensitivity_results.csv           # Table 2 (fixed thresholds)
+    ├── sensitivity_results_percfg.csv    # Table 2 (per-config thresholds)
+    ├── cluster_comparison.json           # Ward/average/PAM silhouette + ARI
+    ├── speaker_metadata_aggregate.csv    # Cohort × attribute summary (Appendix A)
+    ├── strat_coverage_by_cohort.csv      # Appendix A.1: Table A2
+    ├── strat_label_x_cohort.csv          # Appendix A.1: cross-tab
+    ├── strat_self_x_measured.csv         # Appendix A.1: self-id × measured
+    ├── strat_affinity_match.csv          # Appendix A.1: auditory affinity
+    ├── strat_summary.txt                 # Appendix A.1: text summary
+    ├── fig_strat_cohort_bars.png         # Appendix A.1: Figure A1 (left)
+    ├── fig_strat_continuous.png          # Appendix A.1: Figure A1 (right)
+    └── ...
 ```
+
+### Note on per-speaker de-identified metadata
+
+The per-speaker de-identified metadata table (`speaker_metadata_deid.csv`) is **not included** in this anonymous-review repository because it contains hometown and school-name fields whose combination exceeds the aggregate-distribution scope of the IRB consent. An aggregate summary by cohort (`speaker_metadata_aggregate.csv`), which matches the paper's Appendix A and A.1 tables, is included for sanity checking. The per-speaker file will be released with the camera-ready version after release-form review.
 
 ## Data
 
@@ -187,11 +207,14 @@ D = α * DTW(z) + (1-α) * DTW(Δz),  α = 0.7
 - Costs: substitution=1.0, insertion=deletion=1.1
 - Numba JIT acceleration available
 
-### Two-Stage Classification
+### Two-Stage Classification (auxiliary hard-label diagnostic)
 
 - **Stage 1**: {Tokyo, Kagoshima, Kansai-block}
 - **Stage 2**: Kansai-block → {Kansai, Tarui}
-- Ambiguity thresholds: m_abs < 0.01, m_rel < 0.03
+- Ambiguity thresholds: m_abs < 0.011, m_rel < 0.035 (predetermined floors with optional quantile adjustment)
+- Unknown: fewer than two finite Stage-1 distances available
+
+The per-speaker continuous coordinates (4-pole distance vector) are the primary output; hard labels are reported only as supplementary diagnostics.
 
 ### wav2vec 2.0 Baselines
 
@@ -231,10 +254,35 @@ python -m src.wav2vec_enhanced \
 python benchmark_timing.py
 ```
 
-### Failure Mode Visualization (Appendix C, Figure 7)
+### Failure Mode Visualization (Appendix C)
 
 ```bash
 python -m src.visualization
+```
+
+### Parameter Sensitivity (Table 2)
+
+```bash
+python sensitivity_sweep.py \
+    --subject_dir /path/to/subjects \
+    --reference_dir /path/to/references \
+    --excel_path data/accent_types_20251027.xlsx \
+    --subject_csv outputs/supervised_results_with_excel.csv \
+    --output_csv outputs/sensitivity_results.csv
+```
+
+### Clustering Method Comparison
+
+```bash
+python cluster_comparison.py    # reads outputs/unsup_D_total.npy
+```
+
+### Stratified Analysis (Appendix A.1)
+
+```bash
+# Requires the per-speaker de-identified metadata (released camera-ready).
+python build_speaker_table.py
+python stratified_analysis.py
 ```
 
 ## Citation

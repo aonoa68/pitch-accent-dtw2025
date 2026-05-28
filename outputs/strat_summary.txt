@@ -1,0 +1,24 @@
+Stratified analysis summary
+===========================
+
+Total speakers: 68
+Cohorts: {'C1 (younger)': np.int64(28), 'C2 (adult)': np.int64(24), 'C3 (elderly)': np.int64(16)}
+
+Unknown rate by cohort:
+           n  n_unknown  unknown_pct
+cohort                              
+1.0     28.0        5.0         17.9
+2.0     24.0        7.0         29.2
+3.0     16.0        8.0         50.0
+
+Self-identification:
+  dial_self_kansai=1: 21/68
+  dial_self_local=1:  30/68
+  dial_self_kanto=1:  0/68 (nobody identifies as Kanto/Tokyo)
+
+Auditory affinity to each axis:
+     axis  n_with_affinity  n_classified_as  n_both  p_classified_given_aff  p_aff_given_classified
+   kansai               13                5       1                   0.077                   0.200
+    tokyo               36                1       1                   0.028                   1.000
+    tarui               18               27       7                   0.389                   0.259
+kagoshima                1                0       0                   0.000                     NaN
