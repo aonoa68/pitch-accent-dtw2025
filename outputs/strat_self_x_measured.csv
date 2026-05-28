@@ -1,0 +1,5 @@
+self_label,ambiguous,kansai,tarui,tokyo,unknown,All
+kansai_self,6,2,8,0,5,21
+local_self,7,3,10,0,10,30
+other/dk,2,0,9,1,5,17
+All,15,5,27,1,20,68

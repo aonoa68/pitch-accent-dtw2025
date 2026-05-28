@@ -1,0 +1,4 @@
+﻿cohort,n,sex_F,sex_M,age_range,age_mean,dial_self_kansai_n,dial_self_local_n,dial_self_kanto_n,dial_self_dk_n,audio_aff_tokyo_n,audio_aff_kansai_n,audio_aff_tarui_n,audio_aff_kagoshima_n
+C1,28,12,16,13-33,17.9,10,10,0,8,14,7,6,1
+C2,24,14,10,35-55,46.8,6,13,0,5,14,4,6,0
+C3,16,7,9,58-74,67.9,5,7,0,4,8,2,6,0

@@ -1,0 +1,5 @@
+axis,n_with_affinity,n_classified_as,n_both,p_classified_given_aff,p_aff_given_classified
+kansai,13,5,1,0.077,0.2
+tokyo,36,1,1,0.028,1.0
+tarui,18,27,7,0.389,0.259
+kagoshima,1,0,0,0.0,
