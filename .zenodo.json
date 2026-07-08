@@ -1,0 +1,23 @@
+{
+  "title": "Speaker-normalized Acoustic Distance for Japanese Pitch Accent: Design Principles and Evaluation",
+  "description": "Code and materials for a speaker-normalized acoustic distance that positions Japanese speakers along documented pitch-accent gradients. Axis poles are anchored in independent phonological descriptions of four canonical accent varieties (Tokyo, Kansai, Tarui, Kagoshima). Includes the F0 normalization pipeline (semitone + MAD z-scoring), the Sakoe-Chiba constrained DTW distance, baseline metrics (mean F0, histogram EMD, wav2vec 2.0), and the gradient-preservation evaluation on 68 speakers from Kashiwabara (intermediate Tarui zone).",
+  "upload_type": "software",
+  "access_right": "open",
+  "license": "MIT",
+  "creators": [
+    {
+      "name": "Onohara, Ayaka",
+      "affiliation": "Hokusei Gakuen University",
+      "orcid": "0009-0004-3082-3267"
+    }
+  ],
+  "keywords": [
+    "Japanese pitch accent",
+    "prosody",
+    "speaker normalization",
+    "dynamic time warping",
+    "acoustic distance",
+    "dialectology",
+    "speech analysis"
+  ]
+}

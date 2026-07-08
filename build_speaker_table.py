@@ -12,10 +12,10 @@ Continuous axis measure:
 
 Inputs (expected in outputs/):
     - supervised_results_with_excel.csv (released here)
-    - speaker_metadata_deid.csv (NOT included in this anonymous-review
+    - speaker_metadata_deid.csv (NOT included in this public
       repository because per-speaker hometown / school fields exceed the
       aggregate-distribution scope of the IRB consent; will be released
-      with the camera-ready version after release-form review.
+      under restricted access on request (see README).
       An aggregate summary by cohort is provided in
       outputs/speaker_metadata_aggregate.csv for sanity-checking the
       paper's tables.)
@@ -71,13 +71,13 @@ dist["s_kansai_tarui"] = sym_idx(d_K, d_Tar)
 dist["balance_r_TK"] = np.where(np.isfinite(d_K) & np.isfinite(d_Tar) & (d_K > 0),
                                 d_Tar / d_K, np.nan)
 
-# Load metadata (not included in this anonymous-review repository;
+# Load metadata (not included in this public repository;
 # see module docstring).
 meta_path = OUT / "speaker_metadata_deid.csv"
 if not meta_path.exists():
     print(f"[note] {meta_path.name} not present in this distribution.")
     print("       Per-speaker de-identified metadata will be released with the")
-    print("       camera-ready version. See outputs/speaker_metadata_aggregate.csv")
+    print("       on request. See outputs/speaker_metadata_aggregate.csv")
     print("       for cohort-level aggregates that match the paper's tables.")
     sys.exit(0)
 

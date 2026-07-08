@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Stratified analysis for the TACL 2025 paper Appendix.
+Stratified analysis for the JASA manuscript (supplementary material).
 
 Inputs:
     speaker_analysis_table.csv  (68 speakers x distances + metadata)

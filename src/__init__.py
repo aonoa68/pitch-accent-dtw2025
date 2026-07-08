@@ -1,10 +1,10 @@
 """
 Speaker-normalized Acoustic Distance for Japanese Pitch Accent
-TACL 2025
+JASA submission
 """
 
 __version__ = "1.0.0"
-__author__ = "Anonymous"
+__author__ = "Ayaka Onohara"
 
 from .extractor import TrackExtractor
 from .dtw_distance import series_distance, dtw_avg_cost

@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
-This repository provides code and materials for the TACL submission:
+This repository provides code and materials for the manuscript:
 
 > **Speaker-normalized Acoustic Distance for Japanese Pitch Accent: Design Principles and Evaluation**
 
@@ -47,7 +47,7 @@ DTW-based distance remains **CPU-feasible** (<1ms per pair with Numba accelerati
 ## Installation
 
 ```bash
-git clone https://github.com/[anonymous]/pitch-accent-dtw2025.git
+git clone https://github.com/aonoa68/pitch-accent-dtw2025.git
 cd pitch-accent-dtw2025
 pip install -r requirements.txt
 ```
@@ -168,7 +168,7 @@ pitch-accent-dtw2025/
 
 ### Note on per-speaker de-identified metadata
 
-The per-speaker de-identified metadata table (`speaker_metadata_deid.csv`) is **not included** in this anonymous-review repository because it contains hometown and school-name fields whose combination exceeds the aggregate-distribution scope of the IRB consent. An aggregate summary by cohort (`speaker_metadata_aggregate.csv`), which matches the paper's Appendix A and A.1 tables, is included for sanity checking. The per-speaker file will be released with the camera-ready version after release-form review.
+The per-speaker de-identified metadata table (`speaker_metadata_deid.csv`) is **not included** in this public repository because it contains hometown and school-name fields whose combination exceeds the aggregate-distribution scope of the IRB consent. An aggregate summary by cohort (`speaker_metadata_aggregate.csv`), which matches the paper's Appendix A and A.1 tables, is included for sanity checking. The per-speaker de-identified file is available under restricted access on reasonable request, consistent with the IRB consent terms.
 
 ## Data
 
@@ -280,7 +280,7 @@ python cluster_comparison.py    # reads outputs/unsup_D_total.npy
 ### Stratified Analysis (Appendix A.1)
 
 ```bash
-# Requires the per-speaker de-identified metadata (released camera-ready).
+# Requires the per-speaker de-identified metadata (restricted access on request).
 python build_speaker_table.py
 python stratified_analysis.py
 ```
@@ -288,10 +288,10 @@ python stratified_analysis.py
 ## Citation
 
 ```bibtex
-@article{anonymous2025pitchaccent,
+@article{onohara2026pitchaccent,
   title={Speaker-normalized Acoustic Distance for Japanese Pitch Accent: 
          Design Principles and Evaluation},
-  author={Anonymous},
+  author={Onohara, Ayaka},
   journal={Transactions of the Association for Computational Linguistics},
   year={2025},
   note={Under review}
@@ -315,4 +315,4 @@ For questions about the code or data access, please open an issue.
 
 ---
 
-**Note**: This repository is provided for anonymous review. Upon acceptance, the full repository with commit history will be released under an open-source license.
+**Note**: This repository is released under the MIT license (see LICENSE). It accompanies a manuscript currently under review at JASA.

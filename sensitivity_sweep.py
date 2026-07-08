@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Sensitivity sweep for Table 2 of TACL 2025 paper.
+Sensitivity sweep for Table 2 of the JASA manuscript.
 
 Varies (band_ratio, alpha) and reports:
   - Classification agreement with baseline (band=0.15, alpha=0.7)
