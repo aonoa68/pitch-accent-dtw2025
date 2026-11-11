@@ -66,12 +66,12 @@ data/
 If you use the symbolic accent patterns in your research, please cite:
 
 ```bibtex
-@article{onohara2026pitchaccent,
+@misc{onohara2026pitchaccent,
   title={Speaker-normalized Acoustic Distance for Japanese Pitch Accent: 
          Design Principles and Evaluation},
   author={Onohara, Ayaka},
-  journal={Transactions of the Association for Computational Linguistics},
-  year={2025}
+  year={2026},
+  howpublished={GitHub repository, \url{https://github.com/aonoa68/pitch-accent-dtw2025}}
 }
 ```
 
