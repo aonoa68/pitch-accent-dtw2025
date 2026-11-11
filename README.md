@@ -288,13 +288,12 @@ python stratified_analysis.py
 ## Citation
 
 ```bibtex
-@article{onohara2026pitchaccent,
+@misc{onohara2026pitchaccent,
   title={Speaker-normalized Acoustic Distance for Japanese Pitch Accent: 
          Design Principles and Evaluation},
   author={Onohara, Ayaka},
-  journal={Transactions of the Association for Computational Linguistics},
-  year={2025},
-  note={Under review}
+  year={2026},
+  howpublished={GitHub repository, \url{https://github.com/aonoa68/pitch-accent-dtw2025}}
 }
 ```
 
@@ -315,4 +314,4 @@ For questions about the code or data access, please open an issue.
 
 ---
 
-**Note**: This repository is released under the MIT license (see LICENSE). It accompanies a manuscript currently under review at JASA.
+**Note**: This repository is released under the MIT license (see LICENSE). It accompanies an unpublished manuscript, which is not currently under review at any journal.
